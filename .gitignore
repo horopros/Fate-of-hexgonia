@@ -1,0 +1,14 @@
+
+node_modules/
+
+assets/
+
+phaser.min.js
+
+.eslintrc.json
+
+.prettierrc.json
+
+package-lock.json
+
+package.json
