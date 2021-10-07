@@ -1,4 +1,9 @@
-class MapCreation extends Phaser.Scene {
+import MapShapes from './MapShapes.js';
+import Layout from './Layout.js';
+import Hexboard from './Hexboard.js';
+import Hexagon from './Hexagon.js';
+
+export default class MapCreation extends Phaser.Scene {
   constructor() {
     super('hexagonals');
   }

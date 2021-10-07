@@ -1,4 +1,6 @@
-class MapShapes {
+import Hex from './Hex.js';
+
+export default class MapShapes {
   static parallelogram(row, col) {
     let map = new Map();
     for (let q = 0; q < row; q++)

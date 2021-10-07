@@ -1,4 +1,4 @@
-class Hexagon extends Phaser.GameObjects.Sprite {
+export default class Hexagon extends Phaser.GameObjects.Sprite {
   constructor(scene, x, y, image, hex) {
     super(scene, x, y, image);
 

@@ -1,4 +1,7 @@
-class Layout {
+import Orientation from './Orientation.js';
+import Hex from './Hex.js';
+
+export default class Layout {
   static pointy = new Orientation(
     Math.sqrt(3.0),
     Math.sqrt(3.0) / 2.0,

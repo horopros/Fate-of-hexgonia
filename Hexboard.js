@@ -1,4 +1,4 @@
-class Hexboard extends Phaser.GameObjects.Container {
+export default class Hexboard extends Phaser.GameObjects.Container {
   constructor(scene, x, y, layout, boardNumber, type) {
     super(scene, x, y);
     this.layout = layout;

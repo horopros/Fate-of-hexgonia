@@ -1,19 +1,7 @@
-var sceneMainSettings = {
-  hexTileWidth: 32, // è la larghezza della singola immagine esagonale
-  hexTileHeight: 32, // è l'altezza della singola immagine esagonale
-};
+/* eslint-disable import/extensions */
+import MapCreation from './MapCreation.js';
 
-var hexTileSettings = {
-  hexList: [
-    'water', // 0
-    'snow', // 1
-    'dirt', // 2
-    'grass', // 3
-    'grassland', // 4
-  ],
-};
-
-var config = {
+const config = {
   type: Phaser.AUTO,
   width: window.screen.width,
   height: window.screen.height,
@@ -24,4 +12,4 @@ var config = {
   // physics : {default : "arcade", arcade : {debug : false, debugShowVelocity: false}},
 };
 
-var game = new Phaser.Game(config);
+const game = new Phaser.Game(config);
