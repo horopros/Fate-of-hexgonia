@@ -45,7 +45,7 @@ export default class Hex {
   }
 
   static direction(direction) {
-    let directions = [
+    const directions = [
       new Hex(1, 0, -1),
       new Hex(1, -1, 0),
       new Hex(0, -1, 1),

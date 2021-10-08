@@ -2,6 +2,7 @@ import MapShapes from './MapShapes.js';
 import Layout from './Layout.js';
 import Hexboard from './Hexboard.js';
 import Hexagon from './Hexagon.js';
+import Hex from './Hex.js';
 
 export default class MapCreation extends Phaser.Scene {
   constructor() {
@@ -9,7 +10,10 @@ export default class MapCreation extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('grass', 'assets/grass.png');
+    this.load.image('sea', 'assets/sea.png');
+    this.load.image('forest', 'assets/forest.png');
+    this.load.image('mountain', 'assets/mountain.png');
+    this.load.image('desert', 'assets/desert.png');
   }
 
   create() {
@@ -95,6 +99,70 @@ export default class MapCreation extends Phaser.Scene {
   // aggiunge una griglia come un contenitore di sprite
   addFigure(type, grid, layoutType, size, origin, player) {
     const map = grid; // assegnamo la griglia
+
+    let cloneGrid = [...grid];
+    let hexAlreadyChecked = [];
+    cloneGrid = new Map(
+      cloneGrid.map((value) => {
+        const probability = {
+          d: 0.2,
+          f: 0.5,
+          m: 0.2,
+          s: 0.1,
+        };
+        const array = [value[0], probability];
+        return array;
+      }),
+    );
+    cloneGrid.forEach((value, key, map) => {
+      if (!hexAlreadyChecked.includes(key)) {
+        hexAlreadyChecked.push(key);
+        let counter = 0;
+        for (let i = 0; i < 6; i += 1) {
+          const direction = Hex.direction(i);
+          const coord = key.split(',').map((element) => parseInt(element, 10));
+          coord[0] -= direction.q;
+          coord[1] -= direction.r;
+          coord[2] -= direction.s;
+          if (counter >= 2) {
+            const neighbour = map.get(coord.toString());
+            if (neighbour !== undefined) {
+              /* eslint-disable no-param-reassign */
+              value.d += neighbour.d > 0.2 ? -1 * Math.random() : 1 * Math.random();
+              if (value.d > 0.3 && Math.random() > 0.3) {
+                value.d = 0;
+              }
+              value.d = value.d < 0 ? 0 : value.d;
+
+              value.f += neighbour.f > 0.5 ? -1 * Math.random() : 1 * Math.random();
+              value.f = value.f < 0 ? 0 : value.f;
+
+              value.m += neighbour.m > 0.4 ? -1 * Math.random() : 1 * Math.random();
+              if (value.m > 0.6 && Math.random() > 0.3) {
+                value.m = 1;
+              }
+              value.m = value.m < 0 ? 0 : value.m;
+
+              value.s += neighbour.s > 0.1 ? -1 * Math.random() : 1 * Math.random();
+              if (value.s > 0.5 && Math.random() > 0.7) {
+                value.s = 0;
+              }
+              value.s = value.s < 0 ? 0 : value.s;
+              counter = 0;
+            }
+          } else {
+            counter += 1;
+          }
+        }
+        const somma = value.d + value.f + value.m + value.s;
+        value.d /= somma;
+        value.f /= somma;
+        value.m /= somma;
+        value.s /= somma;
+        /* eslint-enable */
+      }
+    });
+
     // creiamo il layout, impostando, inizialmente, le coordinate (0;0)
     const layout = new Layout(layoutType, size, {
       x: 0,
@@ -114,7 +182,31 @@ export default class MapCreation extends Phaser.Scene {
       if (xMax < point.x) xMax = point.x;
       if (yMin > point.y || yMin == null) yMin = point.y;
       if (yMax < point.y) yMax = point.y;
-      const hexSprite = new Hexagon(this, point.x, point.y, 'grass', hexMath); // trasformiamo un oggetto {r,s,q} in uno sprite
+
+      const elementGrid = cloneGrid.get(key);
+      const desertp = elementGrid.d;
+      const seap = elementGrid.s;
+      const forestp = elementGrid.f;
+      const mountainp = elementGrid.m;
+      const prob = [seap, desertp, forestp, mountainp];
+      const random = Math.max(...prob);
+
+      let hexSprite;
+      switch (prob.findIndex((element) => element === random)) {
+        case 0:
+          hexSprite = new Hexagon(this, point.x, point.y, 'sea', hexMath);
+          break;
+        case 1:
+          hexSprite = new Hexagon(this, point.x, point.y, 'desert', hexMath);
+          break;
+        case 2:
+          hexSprite = new Hexagon(this, point.x, point.y, 'forest', hexMath);
+          break;
+        case 3:
+          hexSprite = new Hexagon(this, point.x, point.y, 'mountain', hexMath);
+          break;
+        default:
+      } // trasformiamo un oggetto {r,s,q} in uno sprite
       // al posto dell'oggetto {r,s,q} aggiungiamo lo sprite precedentemente creato
       map.set(key, hexSprite);
     }

@@ -5,7 +5,7 @@ export default class Hexagon extends Phaser.GameObjects.Sprite {
     this.hex = hex;
 
     this.setPosition(x, y);
-    this.setScale(0.205);
+    this.setScale(0.43);
 
     scene.add.existing(this);
   }
