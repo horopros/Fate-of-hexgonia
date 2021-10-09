@@ -19,11 +19,11 @@ export default class MapCreation extends Phaser.Scene {
   create() {
     this.size_hex = { x: 52.4, y: 52.4 }; // dimensioni del singolo esagono
     this.hex_grids = [
-      MapShapes.triangle(3),
-      MapShapes.triangle(3),
-      MapShapes.triangle(3),
-      MapShapes.triangle(3),
-      MapShapes.triangle(3),
+      MapShapes.hexagon(3),
+      MapShapes.hexagon(3),
+      MapShapes.hexagon(3),
+      MapShapes.hexagon(3),
+      MapShapes.hexagon(3),
     ]; // lista delle griglie
     this.can_drag = true; // variabile che indica se è possibile fare il drag oppure no
     this.width_cell = this.size_hex.x / 2; // larghezza della cella
@@ -38,7 +38,7 @@ export default class MapCreation extends Phaser.Scene {
       // fosse stato 1 sarebbe stato triangolo)
       let board;
       board = this.addFigure(
-        1,
+        0,
         this.hex_grids[player],
         Layout.flat,
         this.size_hex,
@@ -250,7 +250,8 @@ export default class MapCreation extends Phaser.Scene {
       return array;
     });
     const overlappedContainers = pairsOfContainers.filter((container) => {
-      if (Phaser.Geom.Rectangle.Overlaps(container[0].rectangle, container[1].rectangle)) {
+      const bVis = container[0].visible && container[1].visible;
+      if (bVis && Phaser.Geom.Rectangle.Overlaps(container[0].rectangle, container[1].rectangle)) {
         return true;
       }
       return false;
