@@ -23,32 +23,43 @@ export default class MapCreation extends Phaser.Scene {
       MapShapes.hexagon(3),
       MapShapes.hexagon(3),
       MapShapes.hexagon(3),
+      MapShapes.hexagon(3),
     ]; // lista delle griglie
     this.can_drag = true; // variabile che indica se è possibile fare il drag oppure no
     this.width_cell = this.size_hex.x / 2; // larghezza della cella
     // altezza della cella
     this.height_cell = Math.sqrt(this.size_hex.x ** 2 - this.width_cell ** 2);
     this.boards = [];
-    for (let player = 0; player < 4; player += 1) {
+
+    let numberOfPlayers = 4;
+
+    for (let player = 0; player < numberOfPlayers + 1; player += 1) {
       // aggiunta prima figura (lo 0 indica il tipo che è l'esagono,
       // fosse stato 1 sarebbe stato triangolo)
-      const board = this.addFigure(
+      let board;
+      board = this.addFigure(
         0,
         this.hex_grids[player],
         Layout.flat,
         this.size_hex,
         {
-          x: Phaser.Math.Snap.To(Math.random() * 1000, this.width_cell),
-          y: Phaser.Math.Snap.To(Math.random() * 600, this.height_cell),
+          x: Phaser.Math.Snap.To(
+            player === 0 ? window.screen.width / 2 : Math.random() * 1000,
+            this.width_cell,
+          ),
+          y: Phaser.Math.Snap.To(
+            player === 0 ? window.screen.height / 2 : Math.random() * 600,
+            this.height_cell,
+          ),
         },
         player,
       );
       this.boards.push(board);
     }
 
-    for (let i = 0; i < 4; i += 1) {
+    for (let i = 0; i < numberOfPlayers + 1; i += 1) {
       this.boards[i].setInteractive();
-      this.input.setDraggable(this.boards[i]);
+      if (i !== 0) this.input.setDraggable(this.boards[i]);
       this.input.enableDebug(this.boards[i]);
     }
 
@@ -88,10 +99,6 @@ export default class MapCreation extends Phaser.Scene {
       `s: ${this.hex.s}`,
       `x: ${pointer.worldX}`,
       `y: ${pointer.worldY}`,
-      `Overlapped: ${Phaser.Geom.Rectangle.Overlaps(
-        this.boards[0].rectangle,
-        this.boards[1].rectangle,
-      )}`,
       `Grid Selected: ${this.grid_selected} `,
     ]);
   }
@@ -174,7 +181,7 @@ export default class MapCreation extends Phaser.Scene {
   }
 
   pressButton(event) {
-    this.scene.grid_selected = this.scene.grid_selected > 2 ? 0 : this.scene.grid_selected + 1;
+    this.scene.grid_selected = this.scene.grid_selected > 3 ? 1 : this.scene.grid_selected + 1;
   }
 
   dragStart(pointer, gameObject) {
@@ -264,6 +271,44 @@ export default class MapCreation extends Phaser.Scene {
         return newArray;
       })
       .filter((child) => child[0][2] !== child[1][2]);
+    const connectedHex = pairsHex
+      .filter((child) => {
+        let centerToVert = (child[0][0].displayWidth / 2 / 2) * Math.sqrt(3);
+        const h1 = centerToVert ** 2 - (centerToVert / 2) ** 2;
+        const height = Math.sqrt(h1);
+
+        const distBtwHexs = Phaser.Math.Distance.Between(
+          child[0][1].x + child[0][0].x,
+          child[0][1].y + child[0][0].y,
+          child[1][1].x + child[1][0].x,
+          child[1][1].y + child[1][0].y,
+        );
+
+        // console.log(distBtwHexs, height, distBtwHexs - height);
+        if (distBtwHexs - height < height * 1.5) {
+          return true;
+        }
+        return false;
+      })
+      .filter((child) => {
+        let flag = false;
+        const x = child[0][1].x + child[0][0].x - (child[1][1].x + child[1][0].x);
+        const y = child[0][1].y + child[0][0].y - (child[1][1].y + child[1][0].y);
+
+        const centerToVert = (child[0][0].displayWidth / 2 / 2) * Math.sqrt(3);
+        const h1 = centerToVert ** 2 - (centerToVert / 2) ** 2;
+        const height = Math.sqrt(h1);
+        if (x < 5 && x >= 0) {
+          flag = true;
+        } else {
+          const acceptedHeight = Math.abs(y) - height;
+          console.log(acceptedHeight);
+
+          if (acceptedHeight < 5 && acceptedHeight >= 0) flag = true;
+        }
+        return flag;
+      });
+    console.log(connectedHex);
     let overlappedHex = pairsHex
       .filter((hex) => {
         let x = hex[0][1].x + hex[0][0].x;
@@ -287,7 +332,6 @@ export default class MapCreation extends Phaser.Scene {
         return distBtwHexs - acceptedDistance < 1;
       })
       .flatMap((hex) => [hex[0][0], hex[1][0]]);
-
     overlappedHex = [...new Set(overlappedHex)];
 
     overlappedHex.forEach((child) => child.setTint('0xFF0000'));
@@ -295,6 +339,10 @@ export default class MapCreation extends Phaser.Scene {
     this.scene.boards.forEach((container) => {
       const difference = container.list.filter((child) => !overlappedHex.includes(child));
       difference.forEach((child) => child.clearTint());
+      const ovrlcont = overlappedContainers.flat();
+      if (!ovrlcont.includes(container) || connectedHex <= 1) {
+        container.iterate((child) => child.setTint('0xFF0000'));
+      }
     });
   }
 
