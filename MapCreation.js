@@ -302,13 +302,11 @@ export default class MapCreation extends Phaser.Scene {
           flag = true;
         } else {
           const acceptedHeight = Math.abs(y) - height;
-          console.log(acceptedHeight);
 
           if (acceptedHeight < 5 && acceptedHeight >= 0) flag = true;
         }
         return flag;
       });
-    console.log(connectedHex);
     let overlappedHex = pairsHex
       .filter((hex) => {
         let x = hex[0][1].x + hex[0][0].x;
