@@ -17,6 +17,7 @@ export default class MapCreation extends Phaser.Scene {
   }
 
   create() {
+    this.registry.set('player', 0);
     this.size_hex = { x: 52.4, y: 52.4 }; // dimensioni del singolo esagono
     this.hex_grids = [
       MapShapes.hexagon(3),
@@ -186,6 +187,7 @@ export default class MapCreation extends Phaser.Scene {
   pressButton(event) {
     this.scene.grid_selected = this.scene.grid_selected > 3 ? 1 : this.scene.grid_selected + 1;
     this.scene.boards[this.scene.grid_selected].setVisible(true);
+    this.scene.registry.values.player = this.scene.grid_selected;
   }
 
   dragStart(pointer, gameObject) {
