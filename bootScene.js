@@ -4,6 +4,6 @@ export default class bootScene extends Phaser.Scene {
   }
 
   create() {
-    this.scene.launch('menu').launch('ui').remove();
+    this.scene.launch('menu').launch('ui').remove('boot');
   }
 }
