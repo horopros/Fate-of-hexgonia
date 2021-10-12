@@ -17,12 +17,25 @@ export default class menuScene extends Phaser.Scene {
       ['test 2', 4, 40],
       ['test 3', 5, 10],
     ];
+    this.inputFlag = false;
 
     this.popUp = this.add.container(640, 360);
 
     let image = this.add.image(0, 0, 'popup').setOrigin(0.5);
     this.popUp.add(image);
-    this.popUp.setVisible(true);
+
+    this.rect = this.popUp.getBounds();
+    this.popUp.setInteractive(this.rect, Phaser.Geom.Rectangle.Contains);
+    this.input.on('pointerdown', (pointer) => {
+      if (this.popUp.visible && !this.rect.contains(pointer.x, pointer.y) && this.inputFlag) {
+        this.popUp.setVisible(false);
+        this.inputFlag = false;
+      } else {
+        this.inputFlag = true;
+      }
+    });
+
+    // this.popUp.on('pointerdown', () => console.log('hello'), this);
 
     image = this.add.image(0, -250, 'line').setScale(0.8, 0.7).setOrigin(0.5);
     this.popUp.add(image);
@@ -89,11 +102,6 @@ export default class menuScene extends Phaser.Scene {
       );
     }
 
-    this.popUp.setInteractive(/*
-      new Phaser.Geom.Rectangle(image.x, image.y, image.displayWidth, image.displayHeight),
-      Phaser.Geom.Rectangle.Contains,
-    */);
-    this.rect = this.popUp.getBounds();
     const background = this.add.image(0, 0, 'background');
     background.setOrigin(0);
 
@@ -117,23 +125,50 @@ export default class menuScene extends Phaser.Scene {
     );
 
     playButton.on('pointerdown', this.popUpMenu, this);
-    console.log(this.rect);
+
+    const hostButton = this.add.container(200, 400);
+    image = this.add.image(0, 0, 'button').setOrigin(0);
+
+    hostButton.add(image);
+    hostButton.add(
+      this.add
+        .text(image.displayWidth / 2, image.displayHeight / 2, 'Host', {
+          fontSize: 48,
+          fontFamily: 'medieval',
+          color: 'black',
+        })
+        .setOrigin(0.5),
+    );
+
+    hostButton.setInteractive(
+      new Phaser.Geom.Rectangle(image.x, image.y, image.displayWidth, image.displayHeight),
+      Phaser.Geom.Rectangle.Contains,
+    );
+
+    hostButton.on('pointerdown', this.hostMenu, this);
   }
 
   update() {
     const pointer = this.input.activePointer;
     const x = pointer.worldX;
     const y = pointer.worldY;
-    const check = this.popUp.visible && !this.rect.contains(x, y) && pointer.isDown;
-    if (check) {
-      this.popUp.setVisible(false);
-    }
+    // console.log(x, y);
+    // const check = this.popUp.visible && pointer.isDown;
+    // console.log(this.popUp.visible && !this.rect.contains(x, y));
+    /* if (this.popUp.visible) {
+      if (!this.rect.contains(x, y)) {
+        this.popUp.setVisible(false);
+      }
+    } */
   }
 
   popUpMenu() {
-    console.log('help');
     this.popUp.setDepth(10);
     this.popUp.setVisible(true);
     // this.scene.switch('hexagonals');
+  }
+
+  hostMenu() {
+    console.log('host');
   }
 }
