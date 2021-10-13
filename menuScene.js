@@ -16,8 +16,10 @@ export default class menuScene extends Phaser.Scene {
       ['test 1', 1, 20],
       ['test 2', 4, 40],
       ['test 3', 5, 10],
+      ['test 4', 3, 50],
     ];
     this.inputFlag = false;
+    this.rectServers = [];
 
     this.popUp = this.add.container(640, 360);
 
@@ -25,7 +27,6 @@ export default class menuScene extends Phaser.Scene {
     this.popUp.add(image);
 
     this.rect = this.popUp.getBounds();
-    this.popUp.setInteractive(this.rect, Phaser.Geom.Rectangle.Contains);
     this.input.on('pointerdown', (pointer) => {
       if (this.popUp.visible && !this.rect.contains(pointer.x, pointer.y) && this.inputFlag) {
         this.popUp.setVisible(false);
@@ -35,7 +36,7 @@ export default class menuScene extends Phaser.Scene {
       }
     });
 
-    // this.popUp.on('pointerdown', () => console.log('hello'), this);
+    this.popUp.on('pointerdown', (pointer) => {}, this);
 
     image = this.add.image(0, -250, 'line').setScale(0.8, 0.7).setOrigin(0.5);
     this.popUp.add(image);
@@ -66,42 +67,39 @@ export default class menuScene extends Phaser.Scene {
         })
         .setOrigin(0),
     );
-    this.rectServers = [];
     for (let i = 0; i < this.listOfGames.length; i += 1) {
-      image = this.add
-        .image(0, -250 + (i + 1) * 50, 'line')
-        .setScale(0.8, 0.7)
-        .setOrigin(0.5);
-      this.popUp.add(image);
-      this.popUp.add(
+      this.rectServers[i] = this.add.container(0, -200 + i * 50);
+      image = this.add.image(0, 10, 'line').setScale(0.8, 0.7).setOrigin(0.5);
+      this.rectServers[i].add(image);
+      this.rectServers[i].add(
         this.add
-          .text(-150, -240 + i * 50, `${this.listOfGames[i][0]}`, {
+          .text(-150, -40, `${this.listOfGames[i][0]}`, {
             fontSize: 18,
             fontFamily: 'medieval',
             color: 'black',
           })
           .setOrigin(0),
       );
-      this.popUp.add(
+      this.rectServers[i].add(
         this.add
-          .text(-20, -240 + i * 50, `${this.listOfGames[i][1]}`, {
+          .text(-20, -40, `${this.listOfGames[i][1]}`, {
             fontSize: 18,
             fontFamily: 'medieval',
             color: 'black',
           })
           .setOrigin(0),
       );
-      this.popUp.add(
+      this.rectServers[i].add(
         this.add
-          .text(110, -240 + i * 50, `${this.listOfGames[i][2]}`, {
+          .text(110, -40, `${this.listOfGames[i][2]}`, {
             fontSize: 18,
             fontFamily: 'medieval',
             color: 'black',
           })
           .setOrigin(0),
       );
+      this.popUp.add(this.rectServers[i]);
     }
-
     const background = this.add.image(0, 0, 'background');
     background.setOrigin(0);
 
