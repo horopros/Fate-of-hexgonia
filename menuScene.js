@@ -16,7 +16,6 @@ export default class menuScene extends Phaser.Scene {
       ['test 1', 1, 20],
       ['test 2', 4, 40],
       ['test 3', 5, 10],
-      ['test 4', 3, 50],
     ];
     this.inputFlag = false;
     this.rectServers = [];
@@ -67,13 +66,34 @@ export default class menuScene extends Phaser.Scene {
         })
         .setOrigin(0),
     );
+
+    this.previous;
     for (let i = 0; i < this.listOfGames.length; i += 1) {
-      this.rectServers[i] = this.add.container(0, -200 + i * 50);
-      image = this.add.image(0, 10, 'line').setScale(0.8, 0.7).setOrigin(0.5);
+      this.rectServers[i] = this.add.container(0, -230 + i * 50);
+      this.rectServers[i].name = this.listOfGames[i].toString();
+      this.rectServers[i].setSize(400, 50);
+      this.rectServers[i].setInteractive();
+      this.input.topOnly = true;
+      this.input.on('gameobjectdown', (pointer, gameObject, event) => {
+        if (gameObject.name !== '' && this.previous !== gameObject.name) {
+          const { scene } = gameObject;
+          scene.registry.set(
+            'game',
+            gameObject.name
+              .split(',')
+              .map((child, index) => (index > 0 ? parseInt(child, 10) : child)),
+          );
+          this.previous = gameObject.name;
+          this.scene.switch('hexagonals');
+        }
+        // this.scene.switch('hexagonals');
+      });
+      this.popUp.add(this.rectServers[i]);
+      image = this.add.image(0, 30, 'line').setScale(0.8, 0.7).setOrigin(0.5);
       this.rectServers[i].add(image);
       this.rectServers[i].add(
         this.add
-          .text(-150, -40, `${this.listOfGames[i][0]}`, {
+          .text(-150, -10, `${this.listOfGames[i][0]}`, {
             fontSize: 18,
             fontFamily: 'medieval',
             color: 'black',
@@ -82,7 +102,7 @@ export default class menuScene extends Phaser.Scene {
       );
       this.rectServers[i].add(
         this.add
-          .text(-20, -40, `${this.listOfGames[i][1]}`, {
+          .text(-20, -10, `${this.listOfGames[i][1]}`, {
             fontSize: 18,
             fontFamily: 'medieval',
             color: 'black',
@@ -91,15 +111,15 @@ export default class menuScene extends Phaser.Scene {
       );
       this.rectServers[i].add(
         this.add
-          .text(110, -40, `${this.listOfGames[i][2]}`, {
+          .text(110, -10, `${this.listOfGames[i][2]}`, {
             fontSize: 18,
             fontFamily: 'medieval',
             color: 'black',
           })
           .setOrigin(0),
       );
-      this.popUp.add(this.rectServers[i]);
     }
+
     const background = this.add.image(0, 0, 'background');
     background.setOrigin(0);
 
@@ -154,8 +174,8 @@ export default class menuScene extends Phaser.Scene {
     // const check = this.popUp.visible && pointer.isDown;
     // console.log(this.popUp.visible && !this.rect.contains(x, y));
     /* if (this.popUp.visible) {
-      if (!this.rect.contains(x, y)) {
-        this.popUp.setVisible(false);
+      if (this.rectServers[0].contains(x, y)) {
+        console.log('mamma');
       }
     } */
   }

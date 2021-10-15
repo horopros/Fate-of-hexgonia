@@ -17,22 +17,20 @@ export default class MapCreation extends Phaser.Scene {
   }
 
   create() {
+    let settings = this.registry.get('game');
     this.registry.set('player', 0);
     this.size_hex = { x: 52.4, y: 52.4 }; // dimensioni del singolo esagono
-    this.hex_grids = [
-      MapShapes.hexagon(3),
-      MapShapes.hexagon(3),
-      MapShapes.hexagon(3),
-      MapShapes.hexagon(3),
-      MapShapes.hexagon(3),
-    ]; // lista delle griglie
+    this.hex_grids = []; // lista delle griglie
     this.can_drag = true; // variabile che indica se è possibile fare il drag oppure no
     this.width_cell = this.size_hex.x / 2; // larghezza della cella
     // altezza della cella
     this.height_cell = Math.sqrt(this.size_hex.x ** 2 - this.width_cell ** 2);
     this.boards = [];
 
-    this.numberOfPlayers = 4;
+    this.numberOfPlayers = settings[1];
+    for (let player = 0; player <= this.numberOfPlayers; player += 1) {
+      this.hex_grids.push(MapShapes.hexagon(3));
+    }
 
     for (let player = 0; player < this.numberOfPlayers + 1; player += 1) {
       // aggiunta prima figura (lo 0 indica il tipo che è l'esagono,
@@ -185,7 +183,11 @@ export default class MapCreation extends Phaser.Scene {
   }
 
   pressButton(event) {
-    this.scene.grid_selected = this.scene.grid_selected > 3 ? 1 : this.scene.grid_selected + 1;
+    if (this.scene.grid_selected > this.scene.numberOfPlayers - 1) {
+      this.scene.grid_selected = 1;
+    } else {
+      this.scene.grid_selected += 1;
+    }
     this.scene.boards[this.scene.grid_selected].setVisible(true);
     this.scene.registry.values.player = this.scene.grid_selected;
   }
