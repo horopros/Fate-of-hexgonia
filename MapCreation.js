@@ -57,6 +57,7 @@ export default class MapCreation extends Phaser.Scene {
     }
 
     for (let i = 0; i < this.numberOfPlayers + 1; i += 1) {
+      this.boards[i].name = `${i}`;
       this.boards[i].setInteractive();
       if (i !== 0) this.input.setDraggable(this.boards[i]);
       this.boards[i].setVisible(false);
@@ -280,7 +281,7 @@ export default class MapCreation extends Phaser.Scene {
         return newArray;
       })
       .filter((child) => child[0][2] !== child[1][2]);
-    const connectedHex = pairsHex
+    let connectedHex = pairsHex
       .filter((child) => {
         let centerToVert = (child[0][0].displayWidth / 2 / 2) * Math.sqrt(3);
         const h1 = centerToVert ** 2 - (centerToVert / 2) ** 2;
@@ -315,8 +316,55 @@ export default class MapCreation extends Phaser.Scene {
           if (acceptedHeight < 5 && acceptedHeight >= 0) flag = true;
         }
         return flag;
+      });
+    let error = connectedHex.map((child) => [child[0][0], child[1][0]]);
+    error = [...new Set(error)];
+    error = this.scene.boards
+      .map((child) => {
+        const dk = [];
+        error.forEach((sprite) => {
+          const container1 = sprite[0].parentContainer;
+          const container2 = sprite[1].parentContainer;
+          if (container1 === child) {
+            if (!dk.includes(container1)) {
+              dk.push(container1);
+            }
+            if (!dk.includes(container2)) {
+              dk.push(container2);
+            }
+          } else if (container2 === child) {
+            if (!dk.includes(container2)) {
+              dk.push(container2);
+            }
+            if (!dk.includes(container1)) {
+              dk.push(container1);
+            }
+          }
+        });
+        return dk;
       })
-      .flatMap((child) => [child[0][0], child[1][0]]);
+      .map((child) => {
+        if (child !== undefined) return child.map((otherchild) => parseInt(otherchild.name, 10));
+        return [];
+      })
+      .filter((child) => child.length !== 0);
+
+    console.clear();
+    let p = [];
+    for (let k = 0; k < error.length; k += 1) {
+      const test1 = new Set();
+      for (let j = 0; j < error[k].length; j += 1) {
+        for (let i = 0; i < error.length; i += 1) {
+          const t = error[i].includes(error[k][j]);
+          if (t) {
+            test1.add(...error[i]);
+          }
+        }
+      }
+      p.push([...test1]);
+    }
+    p = p.filter((child, index, array) => array.every((element) => child.length >= element.length));
+    connectedHex = connectedHex.flatMap((child) => [child[0][0], child[1][0]]);
     let overlappedHex = pairsHex
       .filter((hex) => {
         let x = hex[0][1].x + hex[0][0].x;
@@ -356,6 +404,17 @@ export default class MapCreation extends Phaser.Scene {
         container.iterate((child) => child.setTint('0xFF0000'));
       }
     });
+    let df = false;
+    if (p.length === 0) p.push([]);
+    if (p[0].length >= this.scene.boards.length - 1) {
+      df = true;
+    }
+    const f = this.scene.boards.every((child) => child.visible);
+    if (!df && f) {
+      this.scene.boards.forEach((container) =>
+        container.iterate((child) => child.setTint('0xFF0000')),
+      );
+    }
   }
 
   static createRandomBoard(grid) {

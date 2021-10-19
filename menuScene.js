@@ -12,10 +12,11 @@ export default class menuScene extends Phaser.Scene {
 
   create() {
     this.listOfGames = [
-      ['test', 2, 20],
-      ['test 1', 1, 20],
-      ['test 2', 4, 40],
-      ['test 3', 5, 10],
+      ['test', 1, 20],
+      ['test 1', 2, 20],
+      ['test 2', 3, 40],
+      ['test 3', 4, 10],
+      ['test 4', 5, 15],
     ];
     this.inputFlag = false;
     this.rectServers = [];
